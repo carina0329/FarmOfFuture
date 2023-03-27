@@ -1,0 +1,44 @@
+
+# Import required modules
+import csv
+import sqlite3
+import os
+
+def insert_sensor_data(sensor_file_path):
+    # Connecting to the database
+    connection = sqlite3.connect('db.sqlite3')
+    # Creating a cursor object to execute SQL queries on a database table
+    cursor = connection.cursor()
+    # Table Definition by model django
+    # Opening the testSoilSmall.csv file
+    file = open(sensor_file_path)
+    # Reading the contents
+    contents = csv.reader(file)
+    # Skipping the first line
+    next(contents)
+    # For debugging. Delete data and reset the counter
+    delete_records_sensor = "DELETE FROM mapApp_sensor"
+    delete_sequence_sensor = "DELETE FROM SQLite_sequence WHERE name = 'mapApp_sensor'"
+    # SQL query to insert data into the sensor table
+    insert_records_sensor= "INSERT INTO mapApp_sensor (Date, Depth, Site, Plot, Year, Value) \
+    VALUES(?, ?, ?, ?, ?, ?)"
+    # perform the real insertion
+    cursor.executemany(insert_records_sensor, contents)
+    # cursor.execute(delete_records_sensor)
+    # cursor.execute(delete_sequence_sensor)
+    print("success")
+    # # SQL query to retrieve all data from mapApp_sensor
+    select_all_sensor = "SELECT * FROM mapApp_sensor"
+    rows = cursor.execute(select_all_sensor).fetchall()
+    print(len(rows))
+    # # Output to the console screen
+    for r in rows:
+        print(r)
+    # # Committing the changes
+    connection.commit()
+    # # closing the database connection
+    connection.close()
+
+if __name__ == "__main__":
+    sensor_file_path = "sensor_data/testSoilSmall.csv"
+    insert_sensor_data(sensor_file_path)
