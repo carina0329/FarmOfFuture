@@ -1,15 +1,14 @@
 const sensor={template: `
-<div>
-    <div style="position: relative;">
-      <canvas id="sensor"></canvas>
-      <div style="position: absolute; bottom: 2cm; left: 5cm; display: flex; align-items: center;">
-        <input type="text" id="inputBox" v-model="date_1" placeholder="Start Date" style="margin-right: 10px;">
-        <input type="text" id="inputBox2" v-model="date_2" placeholder="End Date" style="margin-right: 10px;">
-        <input type="text" id="inputBox3" v-model="depth" placeholder="Depth" style="margin-right: 10px;">
-        <button @click="renderLineGraph" style="background-color: #4CAF50; color: white;">Get Soil Data</button>
-      </div>
-    </div>
+<div style="display: flex; flex-direction: column; align-items: center;">
+  <canvas id="sensor"></canvas>
+  <div style="display: flex; justify-content: center; align-items: center; margin-top: 1rem;">
+    <input type="text" id="inputBox" v-model="date_1" placeholder="Start Date" style="margin-right: 1rem; padding: 0.5rem; border: 1px solid #ccc; border-radius: 5px;">
+    <input type="text" id="inputBox2" v-model="date_2" placeholder="End Date" style="margin-right: 1rem; padding: 0.5rem; border: 1px solid #ccc; border-radius: 5px;">
+    <input type="text" id="inputBox3" v-model="depth" placeholder="Depth" style="margin-right: 1rem; padding: 0.5rem; border: 1px solid #ccc; border-radius: 5px;">
+    <button @click="renderLineGraph" style="background-color: #4CAF50; color: white; padding: 0.5rem; border: none; border-radius: 5px;">Get Soil Data</button>
+  </div>
 </div>
+
 `,
 data() {
     return{
@@ -32,7 +31,7 @@ methods:{
         console.log(this.date_2)
         console.log(this.date_list[0])
         for(idx in this.date_list) {
-            if(this.date_list[idx] < this.date_2) {
+            if(this.date_list[idx] <= this.date_2 && this.date_list[idx] >= this.date_1) {
                 label_lst.push(this.date_list[idx]);
             }
         }
@@ -59,7 +58,7 @@ methods:{
               plugins: {
                 title: {
                   display: true,
-                  text: 'Soil Moisture in the specified depth by user'
+                  text: 'Soil Moisture in the specified date range and depth'
                 }
               },
               scales: {
@@ -72,13 +71,14 @@ methods:{
             },
 
         };
-        this.canvas = document.getElementById('sensor');
-        console.log(this.canvas)
+        let canvas = document.getElementById('sensor');
+        console.log(canvas)
         if(this.chartObj) {
             this.chartObj.destroy();
+            console.log("Destroyed Successfully")
         }
         this.chartObj = new Chart(
-            this.canvas,
+            canvas,
             config,
         )
     },
