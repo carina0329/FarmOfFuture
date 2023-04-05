@@ -3,6 +3,14 @@
 import csv
 import sqlite3
 import os
+def delete_all_data():
+    connection = sqlite3.connect('db.sqlite3')
+    cursor = connection.cursor()
+    delete_records_sensor = "DELETE FROM mapApp_sensor"
+    cursor.execute(delete_records_sensor)
+    connection.commit()
+    # # closing the database connection
+    connection.close()
 
 def insert_sensor_data(sensor_file_path):
     # Connecting to the database
@@ -40,5 +48,6 @@ def insert_sensor_data(sensor_file_path):
     connection.close()
 
 if __name__ == "__main__":
-    sensor_file_path = "sensor_data/testSoilSmall.csv"
+    sensor_file_path = "sensor_data/Soilwc.csv"
     insert_sensor_data(sensor_file_path)
+    # delete_all_data()
