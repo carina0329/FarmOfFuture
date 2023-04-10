@@ -5,7 +5,7 @@ const sensor={template: `
     <input type="text" id="inputBox" v-model="date_1" placeholder="Start Date" style="margin-right: 1rem; padding: 0.5rem; border: 1px solid #ccc; border-radius: 5px;">
     <input type="text" id="inputBox2" v-model="date_2" placeholder="End Date" style="margin-right: 1rem; padding: 0.5rem; border: 1px solid #ccc; border-radius: 5px;">
     <input type="text" id="inputBox3" v-model="depth" placeholder="Depth" style="margin-right: 1rem; padding: 0.5rem; border: 1px solid #ccc; border-radius: 5px;">
-    <button @click="renderLineGraph" style="background-color: #4CAF50; color: white; padding: 0.5rem; border: none; border-radius: 5px;">Get Soil Data</button>
+    <button @click="renderLineGraph(date_1, date_2, depth)" style="background-color: #4CAF50; color: white; padding: 0.5rem; border: none; border-radius: 5px;">Get Soil Data</button>
   </div>
 </div>
 
@@ -23,15 +23,21 @@ data() {
     }
 },
 methods:{
-    renderLineGraph(){
+    async initializeLineGraph(){
+        await this.refreshData();
+        // get the latest date available
+        const last10 = this.date_list.slice(-10)
+        this.renderLineGraph(last10[0], last10[9], 10)
+    },
+    renderLineGraph(date_1, date_2, depth){
         // label
         // let date_list = []
         // let depthToVal = {}
         label_lst = []
-        console.log(this.date_2)
+        console.log(date_2)
         console.log(this.date_list[0])
         for(idx in this.date_list) {
-            if(this.date_list[idx] <= this.date_2 && this.date_list[idx] >= this.date_1) {
+            if(this.date_list[idx] <= date_2 && this.date_list[idx] >= date_1) {
                 label_lst.push(this.date_list[idx]);
             }
         }
@@ -39,8 +45,8 @@ methods:{
             labels: label_lst,
             datasets: [
                 {
-                    label: this.depth,
-                    data: this.depthToVal[this.depth],
+                    label: depth,
+                    data: this.depthToVal[depth],
                     yAxisID: 'y',
                 },
             ]
@@ -82,8 +88,8 @@ methods:{
             config,
         )
     },
-    refreshData(){
-        axios.get("http://127.0.0.1:8000/viewsensordata")
+    async refreshData(){
+        await axios.get("http://127.0.0.1:8000/viewsensordata")
         .then((response) => {
             this.sensorData = response.data;
             // console.log(this.sensorData);
@@ -111,6 +117,6 @@ methods:{
 },
 },
 mounted:function(){
-    this.refreshData();
+    this.initializeLineGraph()
 }
 }
