@@ -4,6 +4,7 @@ const map={template: `
       <div id="map" style = "height: 480px"></div>
     </div>
     <div style="display: flex; justify-content: center; align-items: center; margin-top: 1rem;">
+      <v-calendar />
       <input type="text" id="inputBox" v-model="date" placeholder="Enter Date" style="margin-right: 1rem; padding: 0.5rem; border: 1px solid #ccc; border-radius: 5px;">
       <button @click="setupLeafletMap(this.date)" style="background-color: #4CAF50; color: white; padding: 0.5rem; border: none; border-radius: 5px;">Get Satellite Data</button>
     </div>

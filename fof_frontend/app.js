@@ -1,6 +1,6 @@
-  //root component to list the routing parts
-  const routes=[
-    {path:'/home',component:home},
+ //root component to list the routing parts
+const routes=[
+    {path:'/',component:home},
     {path:'/sensor',component:sensor},
     {path:'/map',component:map}
 ]

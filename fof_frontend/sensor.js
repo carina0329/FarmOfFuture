@@ -4,6 +4,10 @@ const sensor={template: `
     <div v-if="loading" style="display: flex; justify-content: center; align-items: center; margin-top: 1rem;">
         <p>Loading...</p>
     </div>
+    <div v-if="showAlert" class="alert"  :style="{ backgroundColor: alertBgColor, color: alertTextColor, padding: alertPadding, marginBottom: alertMarginBottom }">>
+        {{ alertMessage }}
+        <button @click="showAlert = false">Close</button>
+    </div>
     <div v-else style="display: flex; justify-content: center; align-items: center; margin-top: 1rem;">
         <input type="text" id="inputBox" v-model="date_1" placeholder="Start Date" style="margin-right: 1rem; padding: 0.5rem; border: 1px solid #ccc; border-radius: 5px;">
         <input type="text" id="inputBox2" v-model="date_2" placeholder="End Date" style="margin-right: 1rem; padding: 0.5rem; border: 1px solid #ccc; border-radius: 5px;">
@@ -21,11 +25,11 @@ const sensor={template: `
         </select>
         <button @click="renderLineGraph(date_1, date_2, site, plot, depth)" style="background-color: #4CAF50; color: white; padding: 0.5rem; border: none; border-radius: 5px;">Get Soil Data</button>
     </div>
+    
 </div>
 `,
 data() {
     return{
-        sensorData:[],
         depth_list: [],
         date_to_depthToVal: {},
         date_list: [],
@@ -39,9 +43,19 @@ data() {
         loading: true,
         site: null,
         plot: null,
+        showAlert: false,
+        alertMessage: "",
+        alertBgColor: "#f44336",
+        alertTextColor: "white",
+        alertPadding: "10px",
+        alertMarginBottom: "15px",
     }
 },
 methods:{
+    callAlert(msg){
+        this.alertMessage = msg;
+        this.showAlert = true;
+    },
     async initializeLineGraph(){
         this.loading = true;
         await this.refreshData();
@@ -55,21 +69,32 @@ methods:{
         // let date_list = []
         // let depthToVal = {}
         label_lst = []
-        console.log(date_2)
-        console.log(this.date_list[0])
         for(idx in this.date_list) {
             if(this.date_list[idx] <= date_2 && this.date_list[idx] >= date_1) {
                 label_lst.push(this.date_list[idx]);
             }
+        }
+        if(label_lst.lenth == 0){
+            callAlert("No Available Dates!")
         }
         // construct dataset to display
         dataset_sliced = {}
         value_array_render = []
         for(label in label_lst){
             console.log(label_lst[label])
-            console.log(this.date_to_depthToVal[label_lst[label]])
-            dataset_sliced = this.date_to_depthToVal[label_lst[label]]
-            value_array_render.push(dataset_sliced[site][plot][depth][0])
+            if(label_lst[label] in this.date_to_depthToVal) {
+                console.log(this.date_to_depthToVal[label_lst[label]])
+                dataset_sliced = this.date_to_depthToVal[label_lst[label]]
+            }
+            else{
+                this.callAlert("No Available Dates in the database!")
+            }
+            if(site in dataset_sliced && (plot in dataset_sliced[site]) && (depth in dataset_sliced[site][plot])){
+                value_array_render.push(dataset_sliced[site][plot][depth][0])
+            }
+            else {
+                this.callAlert("No data that matches the filters! Try again")
+            }
         }
         console.log(value_array_render)
         const data = {
@@ -166,9 +191,8 @@ methods:{
                 }
                 // this.date_to_depthToVal[date] = depthToVal_tmp;
             }
-            this.depth_list.sort();
-    });
-    
+    },
+    );
 },
 },
 mounted:function(){
