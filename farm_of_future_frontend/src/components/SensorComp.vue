@@ -1,6 +1,6 @@
 <template>
   <div style="display: flex; flex-direction: column; align-items: center;">
-    <canvas id="sensor" style="height: 400px;"></canvas>
+    <canvas id="sensor"></canvas>
     <div v-if="loading" style="display: flex; justify-content: center; align-items: center; margin-top: 1rem;">
       <p>Loading...</p>
     </div>
