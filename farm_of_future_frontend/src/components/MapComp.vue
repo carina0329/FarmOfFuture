@@ -4,19 +4,23 @@
       <div id="map" style="height: 480px"></div>
     </div>
     <!-- <div>latest: {{ this.latestDate }}</div> -->
+    <div v-if="showAlert" class="alert" :style="{ backgroundColor: alertBgColor, color: alertTextColor, padding: alertPadding, marginBottom: alertMarginBottom }">
+      {{ alertMessage }}
+      <button @click="showAlert = false">Close</button>
+    </div>
     <div style="display: flex; justify-content: center; align-items: center; margin-top: 1rem;">
         <VDatePicker 
         v-model="date"
-        :available-dates="available_dates"
+        :attributes="this.attrs"
         mask="YYYY-MM-DD">
         </VDatePicker>
-      <button @click="setupLeafletMap(this.formattedDate)" style="background-color: #4CAF50; color: white; padding: 0.5rem; border: none; border-radius: 5px;">Get Satellite Data</button>
+      <!-- <button @click="setupLeafletMap(this.formattedDate)" style="background-color: #4CAF50; color: white; padding: 0.5rem; border: none; border-radius: 5px;">Get Satellite Data</button> -->
     </div>
   </div>
 </template>
 
 <script>
-// import { ref } from 'vue';
+import { ref } from 'vue';
 import axios from 'axios'
 import L from 'leaflet'
 import 'leaflet-imageoverlay-rotated'
@@ -37,15 +41,34 @@ export default {
       mapInitialized: false,
       map: null,
       available_dates: null,
-      latestDate: null
+      latestDate: null,
+      attrs: null,
+      showAlert: false,
+      alertMessage: "",
+      alertBgColor: "#f44336",
+      alertTextColor: "white",
+      alertPadding: "10px",
+      alertMarginBottom: "15px",
     }
   },
   watch: {
     date: function(newDate) {
       this.formattedDate = moment(newDate).format("YYYY-MM-DD");
+      if(this.available_dates.indexOf(this.formattedDate) !== -1) {
+        console.log("yes, available")
+        this.setupLeafletMap(this.formattedDate);
+      }
+      else{
+        console.log("no, unavailable", this.formattedDate)
+        this.callAlert("No Satellite picture was taken on this date")
+      }
     },
   },
   methods: {
+    callAlert(msg) {
+      this.alertMessage = msg;
+      this.showAlert = true;
+    },
     async get_available_dates() {
       console.log("get_available_dates invoked")
       var request_str = 'http://127.0.0.1:8000/getavailabledate/'
@@ -112,6 +135,23 @@ export default {
     var lst = JSON.parse(this.available_dates.replace(/'/g, '"') || '[]');
     this.available_dates = lst
     this.latestDate = moment.max(this.available_dates.map(date => moment(date))).format('YYYY-MM-DD');
+    var tmp_lst = []
+    for(let idx in this.available_dates){
+      var dt = new Date(this.available_dates[idx])
+      dt.setHours(dt.getHours() + 6)
+      tmp_lst.push(dt)
+    }
+    // need to add the time diff with gmt
+    
+    console.log("latest date: ", this.latestDate)
+    this.attrs = ref([
+        {
+          key: 'available',
+          highlight: 'red',
+          dates: tmp_lst,
+          dot: true,
+        },
+      ]),
     await this.setupLeafletMap(this.latestDate)
   }
 }

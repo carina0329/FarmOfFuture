@@ -1,6 +1,6 @@
 <template>
   <div style="display: flex; flex-direction: column; align-items: center;">
-    <canvas id="sensor"></canvas>
+    <canvas id="sensor" style="height: 400px;"></canvas>
     <div v-if="loading" style="display: flex; justify-content: center; align-items: center; margin-top: 1rem;">
       <p>Loading...</p>
     </div>
@@ -202,3 +202,11 @@ export default {
    }
 }
 </script>
+<style>
+@media only screen and (max-width: 768px) {
+  input[type="text"], select {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+}
+</style>
