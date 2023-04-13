@@ -3,6 +3,7 @@
 import csv
 import sqlite3
 import os
+
 def delete_all_data():
     connection = sqlite3.connect('db.sqlite3')
     cursor = connection.cursor()

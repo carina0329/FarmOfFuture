@@ -4,6 +4,7 @@ from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
 from django.http import HttpResponse
 from insert_image import *
+
 from mapApp.models import Satellite, Sensor
 from mapApp.serializer import SatelliteSerializer, SensorSerializer
 
@@ -28,6 +29,8 @@ def SatelliteDataAPI(request, date=''):
         responseString = "The data on " + date + " has been successfully inserted \n"
         insert_data_all(date)
         return HttpResponse(responseString)
-    
-
- 
+@csrf_exempt
+def SatelliteGetDate(request):
+    if request.method == 'GET':
+        responseString = str(get_satellite_available_dates())
+        return HttpResponse(responseString)

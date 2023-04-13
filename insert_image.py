@@ -5,6 +5,20 @@ from geotiff_viz import *
 import geojson
 import json
 
+def get_satellite_available_dates():
+    result = []
+    connection = sqlite3.connect('db.sqlite3')
+    cursor = connection.cursor()
+    get_dates_sensor = "SELECT DISTINCT Date FROM mapApp_satellite"
+    cursor.execute(get_dates_sensor)
+    record = cursor.fetchall()
+    for r in record:
+        result.append(r[0])
+    connection.commit()
+    # # closing the database connection
+    connection.close()
+    return result
+
 # convert the image into blob
 def convertPngToBlob(imagePath):
     with open(imagePath, 'rb') as file:
@@ -40,7 +54,7 @@ def insert_image_data(rasterPath):
         rasterFileRoot = os.path.splitext(rasterFileName)[0]
         #construct imagePath from raster file path
         imageFileName = rasterFileRoot + '.png'
-        imageFolder = "satellite_data/image_files/"
+        imageFolder = "farm_of_future_frontend/public/satellite_data/image_files/"
         imageFilePath = os.path.join(imageFolder, imageFileName)
         # Write to the image file
         render_tiff(rasterPath, imageFilePath)
@@ -174,5 +188,5 @@ def delete_data_all(tableName):
 if __name__ == "__main__":
     # rasterPath_mar11 =
     # delete_data_all("mapApp_satellite")
-    read_image_data("2023-03-10")
+    print(get_satellite_available_dates())
     
