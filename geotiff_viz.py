@@ -33,6 +33,9 @@ def render_tiff(raster_path, image_path):
     img = img.transpose(1, 2, 0)
     # print(img.shape)
     img = imutils.rotate_bound(img, angle * 180 / np.pi)
+    brightness_factor = 2 # adjust this as needed
+    img *= brightness_factor
+
     newImg = np.array(img)
     # #let's crop all the rows and columns that are all zeros
     rows = 0
@@ -59,14 +62,14 @@ def render_tiff(raster_path, image_path):
 
 if __name__ == "__main__":
     # assign directory
-    directory = 'satellite_data/raster_files/mar8_psscene_analytic_sr_udm2/files'
+    directory = 'satellite_data/raster_files/2023-04-12_psscene_analytic_udm2/files'
     # iterate over files in
     # that directory
     for rasterFileName in os.listdir(directory):
         f = os.path.join(directory, rasterFileName)
         # checking if it is a file
         if os.path.isfile(f):
-            if "AnalyticMS_SR" in f:
+            if f.endswith(".tif") and "Analytic" in f:
                 image_filename = os.path.splitext(rasterFileName)[0] + ".png"
                 image_folder = "satellite_data/image_files/"
                 image_path = os.path.join(image_folder, image_filename)

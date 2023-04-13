@@ -32,14 +32,19 @@ def insert_data_all(date):
     rasterFoldersOnDate = [rasterMainFolder + rasterFolder
                     for rasterFolder in os.listdir(rasterMainFolder) 
                     if stSearch in rasterFolder]
+    print(rasterFoldersOnDate)
     # print(rasterFoldersOnDate)
     for rasterFolder in rasterFoldersOnDate:
         rasterFilesPath = rasterFolder + "/files"
+        print(rasterFilesPath)
         for rasterFileName in os.listdir(rasterFilesPath):
+            print(rasterFileName)
             f = os.path.join(rasterFilesPath, rasterFileName)
             # checking if it is a file
             if os.path.isfile(f):
-                if "AnalyticMS_SR" in f:
+                if f.endswith("tif") and "Analytic" in f:
+                    print("------------")
+                    print(f)
                     insert_image_data(f)
 
 # insert in database the tif file with the specified path
@@ -129,6 +134,7 @@ def read_image_data(date):
         print(e)
     finally:
         if connection:
+            connection.commit()
             connection.close()
             resJsonObjectStr = json.dumps(resJsonObject)
             print(resJsonObjectStr)
@@ -176,17 +182,24 @@ def delete_data_all(tableName):
     connection = sqlite3.connect('db.sqlite3')
     print("Successful connection!")
     cursor = connection.cursor()
-    delete_records_satellite = "DELETE FROM " + tableName
+    delete_records_satellite = f"""
+    DELETE FROM {tableName}
+    """
     cursor.execute(delete_records_satellite)
-    selectFileData = "SELECT * FROM " + tableName
+    connection.commit()
+    selectFileData = f"""
+    SELECT *
+    FROM {tableName}
+    """
     cursor.execute(selectFileData)
     record = cursor.fetchall()
     print(len(record))
     connection.commit()
+    connection.close()
     print("Successful deletion operation!")
 
 if __name__ == "__main__":
     # rasterPath_mar11 =
     # delete_data_all("mapApp_satellite")
-    print(get_satellite_available_dates())
+    delete_data_all("mapApp_satellite")
     
