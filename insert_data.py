@@ -48,7 +48,24 @@ def insert_sensor_data(sensor_file_path):
     # # closing the database connection
     connection.close()
 
+def get_last_10_days():
+    connection = sqlite3.connect('db.sqlite3')
+    # Creating a cursor object to execute SQL queries on a database table
+    cursor = connection.cursor()
+    select_last10_sensor = "SELECT Date, Depth, Site, Plot FROM mapApp_sensor GROUP BY DATE ORDER BY DATE DESC LIMIT 10"
+    rows = cursor.execute(select_last10_sensor).fetchall()
+    lst = []
+    for r in rows:
+        lst.append(r)
+    print(lst)
+    connection.commit()
+    # # closing the database connection
+    connection.close()
+    return lst
+
 if __name__ == "__main__":
-    sensor_file_path = "sensor_data/Soilwc.csv"
-    insert_sensor_data(sensor_file_path)
-    # delete_all_data()
+    # sensor_file_path = "sensor_data/Soilwc.csv"
+    # insert_sensor_data(sensor_file_path)
+    # get_last_10_days()
+    delete_all_data()
+    # pass

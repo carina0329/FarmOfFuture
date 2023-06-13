@@ -3,7 +3,6 @@
     <div id="map-bx">
       <div id="map" style="height: 480px"></div>
     </div>
-    <!-- <div>latest: {{ this.latestDate }}</div> -->
     <div v-if="showAlert" class="alert" :style="{ backgroundColor: alertBgColor, color: alertTextColor, padding: alertPadding, marginBottom: alertMarginBottom }">
       {{ alertMessage }}
       <button @click="showAlert = false">Close</button>
@@ -14,7 +13,6 @@
         :attributes="this.attrs"
         mask="YYYY-MM-DD">
         </VDatePicker>
-      <!-- <button @click="setupLeafletMap(this.formattedDate)" style="background-color: #4CAF50; color: white; padding: 0.5rem; border: none; border-radius: 5px;">Get Satellite Data</button> -->
     </div>
   </div>
 </template>
@@ -84,21 +82,20 @@ export default {
       await axios
         .get(request_str)
         .then(response => {
-          this.topleftLat = response.data[0].TopLeftLat
-          this.topleftLng = response.data[0].TopLeftLng
-          this.bottomleftLat = response.data[0].BottomLeftLat
-          this.bottomleftLng = response.data[0].BottomLeftLng
-          this.toprightLat = response.data[0].TopRightLat
-          this.toprightLng = response.data[0].TopRightLng
-          let path_list = response.data[0].ImageFilePath.split("/").slice(-3)
+          this.topleftLat = response.data.TopLeftLat
+          this.topleftLng = response.data.TopLeftLng
+          this.bottomleftLat = response.data.BottomLeftLat
+          this.bottomleftLng = response.data.BottomLeftLng
+          this.toprightLat = response.data.TopRightLat
+          this.toprightLng = response.data.TopRightLng
+          let path_list = response.data.ImageFilePath.split("/").slice(-3)
           this.imageUrl = './' + path_list[0] + "/" + path_list[1] + "/" + path_list[2]
           console.log(this.imageUrl)
           // this.imageUrl = '/satellite_data/image_files/20230308_155050_27_24cc_3B_AnalyticMS_SR_clip.png'
-          
         })
     },
     initializeLeafletMap() {
-      this.map = L.map('map').setView([40.113159, -88.211105], 10)
+      this.map = L.map('map').setView([40.0677565, -88.211625], 16);
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(this.map)
@@ -106,8 +103,6 @@ export default {
     },
     async setupLeafletMap(date) {
       console.log("Date is: ", date)
-      // const formattedDate = moment(date.toISOString()).format('YYYY-MM-DD');
-      // console.log("Date formatted is: ", formattedDate)
       await this.get_data(date)
       if (this.mapInitialized === true) {
         this.map.off()
@@ -118,31 +113,35 @@ export default {
       this.setImageOverlay();
     },
     setImageOverlay() {
-      var topleft = L.latLng(this.topleftLat, this.topleftLng)
-      var bottomleft = L.latLng(this.bottomleftLat, this.bottomleftLng)
-      var topright = L.latLng(this.toprightLat, this.toprightLng)
+      var topleft_ = L.latLng(40.069036142012, -88.21403682638878)
+      var topright_ = L.latLng(40.06912901675976, -88.20924301795053)
+      var bottomleft_ = L.latLng(40.06539844811567, -88.21395591822947)
       var imageUrl = this.imageUrl
       if (this.mapInitialized) {
-        L.imageOverlay.rotated(imageUrl, topleft, topright, bottomleft).addTo(this.map)
+        L.imageOverlay.rotated(imageUrl, topleft_, topright_, bottomleft_, {opacity: 0.9}).addTo(this.map)
       }
+      var bounds = [
+          [40.069036142012, -88.21403682638878],
+          [40.06912901675976, -88.20924301795053],
+          [40.065460367934776, -88.20926324499034],
+          [40.06539844811567, -88.21395591822947]
+      ].map(function(coords) { return L.latLng(coords); });
+      L.rectangle(bounds).addTo(this.map);
     }
   },
   async mounted() {
     await this.get_available_dates();
-    // console.log("hjwvbcwrjhbw", this.available_dates)
-    // let last_date_available =  moment.max(this.available_dates.map(date => moment(date))).format('YYYY-MM-DD');
-    // console.log("gggggggg", last_date_available)
     var lst = JSON.parse(this.available_dates.replace(/'/g, '"') || '[]');
     this.available_dates = lst
     this.latestDate = moment.max(this.available_dates.map(date => moment(date))).format('YYYY-MM-DD');
     var tmp_lst = []
     for(let idx in this.available_dates){
       var dt = new Date(this.available_dates[idx])
-      dt.setHours(dt.getHours() + 6)
+      // TODO: need to add the time diff with gmt
+      dt.setHours(dt.getHours() + 8)
       tmp_lst.push(dt)
     }
-    // need to add the time diff with gmt
-    
+  
     console.log("latest date: ", this.latestDate)
     this.attrs = ref([
         {

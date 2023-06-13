@@ -1,0 +1,58 @@
+{
+    "item_types":[
+        "PSScene"
+     ],
+    "filter":{
+        "type":"AndFilter",
+        "config":[
+            {
+                "type":"AssetFilter",
+                "config":[
+                   "ortho_visual"
+                ]
+             },
+            {
+                "type":"DateRangeFilter",
+                "field_name":"acquired",
+                "config":{
+                   "gt":"2023-02-01T00:00:00Z",
+                   "lte":"2023-03-31T00:00:00Z"
+                }
+            },
+            {
+                "type":"GeometryFilter",
+                "field_name":"geometry",
+                "config": {
+                    "type": "Polygon",
+                    "coordinates": [
+                    [
+                        [
+                            -88.21403682638878,
+                            40.069036142012
+                        ],
+                        [
+                            -88.20924301795053,
+                            40.06912901675976
+                        ],
+                        [
+                            -88.20926324499034,
+                            40.065460367934776
+                        ],
+                        [
+                            -88.21395591822947,
+                            40.06539844811567
+                        ],
+                        [
+                            -88.21403682638878,
+                            40.069036142012
+                        ]
+                    ]
+                    ]
+                }
+            }
+        ]
+    }
+
+}
+
+

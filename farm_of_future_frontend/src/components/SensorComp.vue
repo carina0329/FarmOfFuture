@@ -60,11 +60,19 @@ export default {
       this.showAlert = true;
     },
     async initializeLineGraph(){
+        var parsedList;
+        var parsedListSorted;
         this.loading = true;
         await this.refreshData();
         // get the latest date available
         const last10 = this.date_list.slice(-10)
-        this.renderLineGraph(last10[0], last10[9], "energyFarm", "MaizeControl", 20)
+        await axios.get("http://127.0.0.1:8000/getlast10")
+        .then((response) => {
+          console.log(response.data)
+          parsedList = JSON.parse(response.data)
+          parsedListSorted = parsedList.sort((a, b) => b[1] - a[1])
+        })
+        this.renderLineGraph(last10[0], last10[9], parsedListSorted[0][2], parsedListSorted[0][3],  parsedListSorted[0][1])
         this.loading = false;
     },
     renderLineGraph(date_1, date_2, site, plot, depth){
