@@ -200,7 +200,8 @@ def write_blob_data(imageFileBlob, localTempFile):
         file.write(imageFileBlob)
     print("Success! Data has been written to the local temp file: ", localTempFile)
 
-def delete_data_all(tableName):
+def delete_all_satellite_data():
+    tableName = "mapApp_satellite"
     connection = sqlite3.connect('db.sqlite3')
     print("Successful connection!")
     cursor = connection.cursor()
@@ -228,5 +229,5 @@ if __name__ == "__main__":
     # rasterPath_mar11 =
     # delete_data_all("mapApp_satellite")
     # insert_image_data("satellite_data/test/20230301_155145_86_24cc_3B_Visual_clip.tif")
-    delete_data_all("mapApp_satellite")
+    delete_all_satellite_data()
     

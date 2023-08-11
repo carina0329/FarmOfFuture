@@ -49,6 +49,7 @@ def search(date, date2=None):
     return search_res_item_list
 
 def place_order(item_ids, order_name):
+    print("Preparing to place an order with {} items".format(len(item_ids)))
     session = requests.Session()
     session.auth = (API_KEY, "")
     request = {
@@ -79,6 +80,11 @@ def place_order(item_ids, order_name):
     return res.json()["id"]
 
 def download_order(order_id, download_dir):
+    print("Preparing to download order with id {}".format(order_id))
+    download_directory_path = os.path.join("satellite_data/raster_files", download_dir)
+    if os.path.exists(download_directory_path):
+        shutil.rmtree(download_directory_path)
+    os.makedirs(download_directory_path)
     session = requests.Session()
     session.auth = (API_KEY, "")
     check_url = ORDER_URL + "/" + order_id
@@ -95,7 +101,7 @@ def download_order(order_id, download_dir):
         result_file_name = result_file["name"]
         result_file_location = result_file["location"]
         result_file_name_local = os.path.basename(result_file_name)
-        result_file_path_local = os.path.join(download_dir, result_file_name_local)
+        result_file_path_local = os.path.join(download_directory_path, result_file_name_local)
         res_download = session.get(result_file_location)
         with open(result_file_path_local, "wb") as file_:
             for chunk in res_download.iter_content(chunk_size=1024):
@@ -103,15 +109,3 @@ def download_order(order_id, download_dir):
                     file_.write(chunk)
                     file_.flush()
 
-if __name__ == "__main__":
-    download_order("d34ffb9c-53db-45bf-8f8a-6bf8557b28b8", "satellite_data/test")
-    # items = search("2023-01-01", "2023-01-31")
-    # # items = search("2023-04-11")
-    # if(len(items) > 0):
-    #     try:
-    #         order_id = place_order(items, "test_order")
-    #         download_order(order_id)
-    #     except:
-    #         print("Error encountered during downloading order!")
-    #         exit(1)
-    

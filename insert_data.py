@@ -4,7 +4,7 @@ import csv
 import sqlite3
 import os
 
-def delete_all_data():
+def delete_all_sensor_data():
     connection = sqlite3.connect('db.sqlite3')
     cursor = connection.cursor()
     delete_records_sensor = "DELETE FROM mapApp_sensor"
@@ -67,5 +67,5 @@ if __name__ == "__main__":
     # sensor_file_path = "sensor_data/Soilwc.csv"
     # insert_sensor_data(sensor_file_path)
     # get_last_10_days()
-    delete_all_data()
+    delete_all_sensor_data()
     # pass
