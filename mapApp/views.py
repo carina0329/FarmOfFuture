@@ -8,6 +8,7 @@ from insert_data import *
 import json
 from mapApp.models import Satellite, Sensor
 from mapApp.serializer import SatelliteSerializer, SensorSerializer
+from planet_api_requests import *
 
 # Create your views here.
 @csrf_exempt
@@ -38,6 +39,24 @@ def SatelliteDataAPI(request, date=''):
         responseString = "The data on " + date + " has been successfully inserted \n"
         insert_data_all(date)
         return HttpResponse(responseString)
+@csrf_exempt
+def PlanetImageAPI(request, date=''):
+    responseString = ""
+    if request.method == 'GET':
+        planetRequests = PlanetRequests()
+        item_ids = planetRequests.search(date)
+        if(len(item_ids) > 0):
+            try:
+                order_id = planetRequests.place_order(item_ids, "Images_on_{}".format(date))
+                planetRequests.download_order(order_id, "images_{}".format(date))
+                responseString = "Order with id {} has been downloaded successfully in {}".format(order_id, "images_{}".format(date))
+            except Exception as error:
+                responseString = "Error {} encountered during placing or downloading order!".format(error)
+            finally:
+                return HttpResponse(responseString)
+        responseString = "No results were found in the search. Try different filters and search again"
+        return HttpResponse(responseString)
+
 @csrf_exempt
 def SatelliteGetDate(request):
     if request.method == 'GET':

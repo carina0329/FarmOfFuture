@@ -5,7 +5,9 @@ from geotiff_viz_4band import *
 from datetime import datetime, time, timedelta
 import geojson
 import json
+import shutil
 
+SatelliteImageFolder = "farm_of_future_frontend/public/satellite_data/image_files/"
 def get_satellite_available_dates():
     result = []
     connection = sqlite3.connect('db.sqlite3')
@@ -32,6 +34,7 @@ def insert_data_on_date(date):
 
 def insert_data_all(folder_name):
     # find raster folder based on date
+    print("about to insert data to db")
     raster_main_folder = 'satellite_data/raster_files/'
     raster_folder_path = os.path.join(raster_main_folder, folder_name)
     for root, dirs, files in os.walk(raster_folder_path):
@@ -65,7 +68,7 @@ def insert_image_data(rasterFilePath):
         getjson_file = rasterFileList[0] + "_" + rasterFileList[1] + "_" + rasterFileList[2] + "_" + rasterFileList[3] + "_" + "metadata.json"
         getjson_path = os.path.join(rasterFileFolder, getjson_file)
         if os.path.exists(getjson_path):
-            print("it exists")
+            print("geojson file is valid")
             print(getjson_path)
         # TODO: ingest geojson
         with open(getjson_path) as f:
@@ -201,6 +204,9 @@ def write_blob_data(imageFileBlob, localTempFile):
     print("Success! Data has been written to the local temp file: ", localTempFile)
 
 def delete_all_satellite_data():
+    if os.path.exists(SatelliteImageFolder):
+        shutil.rmtree(SatelliteImageFolder)
+    os.makedirs(SatelliteImageFolder)
     tableName = "mapApp_satellite"
     connection = sqlite3.connect('db.sqlite3')
     print("Successful connection!")

@@ -5,6 +5,23 @@ from insert_image import *
 from insert_data import *
 from planet_api_requests import *
 
+def insert_init_data():
+    date2 = datetime.now().strftime('%Y-%m-%d')
+    date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+    print("Date range starts {}".format(date2))
+    print("Date range ends {}".format(date))
+    planetRequests = PlanetRequests()
+    item_ids = planetRequests.search(date, date2)
+    if(len(item_ids) > 0):
+        try:
+            order_id = planetRequests.place_order(item_ids, "last_30days")
+            planetRequests.download_order(order_id, "init_data")
+        except Exception as error:
+            print("Error {} encountered during placing or downloading order!".format(error))
+            exit(1)
+        print("Downloaded sensor and satellite data successfully!")
+    else:
+        print("No satellite image was found in the last 30 days! Init failed. Please try manually insert data!")
 
 def check_for_new_sensor_file():
     print("checking sensor data......")
@@ -42,29 +59,18 @@ def check_for_satellite_data():
         check_for_new_satellite_folder()
 
 if __name__ == "__main__":
-    # TODO: delete everything in the db
-    # TODO: poll planet API to include to write data in the latest month
+    # delete everything in the db
+    # poll planet API to include to write data in the latest month
     delete_all_sensor_data()
     delete_all_satellite_data()
     # get the date today in YYYY-MM-DD
     # get the date 30 days back in YYYY-MM-DD
-    date2 = datetime.now().strftime('%Y-%m-%d')
-    date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
-    print(date)
-    print(date2)
-    item_ids = search(date, date2)
-    print()
-    if(len(item_ids) > 0):
-        try:
-            order_id = place_order(item_ids, "last_30days")
-            download_order(order_id, "init_data")
-        except:
-            print("Error encountered during downloading order!")
-            exit(1)
-    download_order(order_id, "satellite_data")
     p1 = Process(target=check_for_new_sensor_file)
     p2 = Process(target=check_for_new_satellite_folder)
+    p3 = Process(target=insert_init_data)
     p1.start()
     p2.start()
+    p3.start()
     p1.join()
     p2.join()
+    p3.join()
