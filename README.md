@@ -1,34 +1,30 @@
 # FarmOfFuture
 
 ## Overview
+The FarmOfFuture app acts as a platform that efficiently collects satellite data from [Planet](https://www.planet.com/) and soil data from sensors installed throughout our research farm. This combination offers users an in-depth look at the farm, utilizing satellite images and sensor insights for valuable analysis.
 
-The FarmOfFuture app is built using Python and JavaScript. The backend is developed with Python using the Django Framework, while the frontend utilizes JavaScript with the Vue framework.
+## Tech Stack
+The FarmOfFuture app is developed using Python and JavaScript. The backend is built with Python using the Django Framework, while the frontend is created with JavaScript using the Vue framework. The app incorporates essential dependencies like [Leaflet](https://leafletjs.com/) for overlaying satellite images on interactive maps, and [Chart.js](https://www.chartjs.org/docs/latest/) for visually presenting sensor data in an engaging manner.
 
 ## How to Run the Code
+To run the code, open three terminal windows on your local device and follow these steps:
+### Running the Data Listener
+1. To initiate the data listener, open the first terminal window and execute the command `python init_app.py`. It's important to note that this step involves polling the satellite data archive from the past 30 days on [Planet](https://www.planet.com/). The duration of this process can vary, approximately taking around 10 minutes. The time taken is subject to the processing speed of [Planet](https://www.planet.com/) in handling image requests. Please make sure PL_API_KEY is set up properly.
+[Demo video](https://drive.google.com/file/d/1fD93gQeetTbgsGiLpswLROMIrq-tW_T6/view?usp=sharing)
+### Setting up Backend and Frontend
+2. In a separate terminal window, initiate the backend server by executing the command python manage.py runserver 8000.
+3. In another terminal window, navigate to the farm_of_future_frontend/ directory and run npm run serve to launch the frontend.
 
-To run the code, follow these steps:
+## Source of Data
 
-1. Open three terminal windows on your local device.
-2. In the first terminal window, start the data listener by running `python check_new_data.py`.
-3. In the second window, start the backend server by running `python manage.py runserver 8000`.
-4. In the third window, navigate to the `farm_of_future_frontend/` directory and run `npm run serve` to start the frontend.
-
-### Source of Data
-
-#### Satellite Imagery
+### Satellite Imagery
 
 To obtain satellite imagery data, follow these steps:
 
-1. Obtain a Planet API key from your Planet account portal.
-2. Set up proper authentication by opening the terminal and setting the API key as an environment variable. For example, in macOS, use the command: `export PL_API_KEY='<Your API Key>'`.
-3. After authentication, navigate to the `planet_api_requests.py` file. The Planet API requires searching for images within a specific date range, placing an order, and waiting for it to be processed. Once processed, the image can be downloaded to a desired folder. Here's an example of the workflow:
-
-```python
-items = search("2023-01-01", "2023-01-31")
-order_id = place_order(items, "test_order")
-download_order(order_id, 'satellite_data/raster_files/test')
+1. Get an API key from your Planet account.
+2. Create a local .env file and include the line `PL_API_KEY=<your_API_key>` in it. Django uses this file to read the environment variable.
+3. Alongside the data listener during app startup, when a user selects a date without available satellite data, we'll automatically request the image from Planet and display it. Please watch [a demo video to illustrate the this workflow](https://drive.google.com/file/d/1hD6eraIvUZCnXmTvUthuk6SPReJRLi_6/view?usp=sharing).
 ```
-
 #### Sensor Data
 
 To include sensor data, follow these steps:
@@ -37,14 +33,5 @@ To include sensor data, follow these steps:
 2. The CSV file must have the following columns for proper parsing and insertion into the database: Date, Depth, Site, Plot, Year, Value.
 3. Add the CSV file to the `sensor_data` folder in the main project directory.
 
-### Backend
-
-The backend of the FarmOfFuture app is implemented using Python with the Django Framework. URLs and endpoints can be found in `mapApp/urls.py` and `mapApp/views.py`.
-
-### Frontend
-
-The frontend is developed using Vue.js. The Chart.js library is used to display the sensor data, while the Leaflet.js library is used to display the satellite data received from the backend.
-
-### Work to be Done
-
-Currently, developers need to manually load satellite data from Planet. However, work is underway to integrate this workflow into the frontend. When a user clicks on an unavailable date, the backend will trigger the workflow to fetch imagery from Planet. The estimated completion time for this integration is the end of June.
+### Future Work
+Optimizing the app's startup time is a significant goal. Currently, the initialization process involves multiple stages: searching for targeted satellite images, placing orders for these images on Planet's platform, downloading the ordered images, and finally recording them in the app's database. Enhancing the efficiency of these steps, possibly through parallelization or improved data handling strategies, could notably reduce the app's initialization time and provide a smoother user experience.
