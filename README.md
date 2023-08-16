@@ -24,8 +24,7 @@ To obtain satellite imagery data, follow these steps:
 1. Get an API key from your Planet account.
 2. Create a local .env file and include the line `PL_API_KEY=<your_API_key>` in it. Django uses this file to read the environment variable.
 3. Alongside the data listener during app startup, when a user selects a date without available satellite data, we'll automatically request the image from Planet and display it. Please watch [a demo video to illustrate the this workflow](https://drive.google.com/file/d/1hD6eraIvUZCnXmTvUthuk6SPReJRLi_6/view?usp=sharing).
-```
-#### Sensor Data
+### Sensor Data
 
 To include sensor data, follow these steps:
 
