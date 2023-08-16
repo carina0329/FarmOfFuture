@@ -32,5 +32,8 @@ To include sensor data, follow these steps:
 2. The CSV file must have the following columns for proper parsing and insertion into the database: Date, Depth, Site, Plot, Year, Value.
 3. Add the CSV file to the `sensor_data` folder in the main project directory.
 
+### Backend Endpoints
+A detailed description of backend endpoints can be found [here](https://github.com/carina0329/FarmOfFuture/tree/main/mapApp#backend-endpoints)
+
 ### Future Work
 Optimizing the app's startup time is a significant goal. Currently, the initialization process involves multiple stages: searching for targeted satellite images, placing orders for these images on Planet's platform, downloading the ordered images, and finally recording them in the app's database. Enhancing the efficiency of these steps, possibly through parallelization or improved data handling strategies, could notably reduce the app's initialization time and provide a smoother user experience.
