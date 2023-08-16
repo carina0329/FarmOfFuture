@@ -58,7 +58,9 @@ export default {
       }
       else{
         console.log("no, unavailable", this.formattedDate)
-        this.callAlert("No Satellite picture was taken on this date")
+        // call planet to download the data
+        this.callAlert("No Satellite picture was stored on this date. Polling planet for data...")
+        this.get_data_from_planet(this.formattedDate)
       }
     },
   },
@@ -91,6 +93,15 @@ export default {
           let path_list = response.data.ImageFilePath.split("/").slice(-3)
           this.imageUrl = './' + path_list[0] + "/" + path_list[1] + "/" + path_list[2]
           console.log(this.imageUrl)
+          // this.imageUrl = '/satellite_data/image_files/20230308_155050_27_24cc_3B_AnalyticMS_SR_clip.png'
+        })
+    },
+    async get_data_from_planet(date_input) {
+      var request_str = 'http://127.0.0.1:8000/getsatellitedata/' + date_input
+      await axios
+        .get(request_str)
+        .then(response => {
+          this.callAlert(response)
           // this.imageUrl = '/satellite_data/image_files/20230308_155050_27_24cc_3B_AnalyticMS_SR_clip.png'
         })
     },

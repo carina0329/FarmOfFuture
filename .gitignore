@@ -1,0 +1,6 @@
+farm_of_future_frontend/public/satellite_data/
+db.sqlite3
+.DS_Store
+*.pyc
+.env
+satellite_data
